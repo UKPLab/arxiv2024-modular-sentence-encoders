@@ -26,7 +26,7 @@ This project requires Python 3.10. To install the requirements:
 ### Monolingual specialization
 
 #### Step 1: Train Language-specific Tokenizer and Embeddings
-The script [`focus.py`](focus.py) is used for training language-specific tokenizers and initialize the new embeddings with FOCUS:
+The script [`focus.py`](focus.py) is used for training language-specific tokenizers and initializing the new embeddings with FOCUS:
 
 ```bash
 python focus.py \
@@ -49,8 +49,8 @@ python train_mlm.py \
     --train_file data/language_adaptation/deu_train.txt \
     --validation_file data/language_adaptation/deu_val.txt \
     --model_name_or_path sentence-transformers/LaBSE \
-    --tokenizer_name model/tokenizer/uzn_labse \
-    --embedding_path model/embedding/uzn_labse  \
+    --tokenizer_name model/tokenizer/deu_labse \
+    --embedding_path model/embedding/deu_labse  \
     --max_seq_length 256 \
     --per_device_train_batch_size 128 \
     --gradient_accumulation_steps 2 \
@@ -95,7 +95,7 @@ After training monolingual sentence encoders, we train cross-lingual adapters to
 ```bash
 python train_cla_adapter.py \
     --pivot_lang eng \
-    --target_lang azj \
+    --target_lang deu \
     --pivot_model_name_or_path model/mono_encoder/labse_eng \
     --target_model_name_or_path model/mono_encoder/labse_deu \
     --max_seq_length 128 \
@@ -107,7 +107,7 @@ python train_cla_adapter.py \
 ```
 Parameter description
 - `--pivot_lang`: We always use English as our pivot language and align each non-English encoder to the English encoder. 
-- `--pivot_model_name_or_path` is the name or path of the pivot language model, i.e. the English encoder trained in Step 3 in monolingual specializtion. 
+- `--pivot_model_name_or_path` is the name or path of the pivot language model, i.e. the English encoder trained in Step 3 in monolingual specialization. 
 - `--target_lang` is the language of the encoder that should be aligned to the English encoder.
 - `--target_model_name_or_path` is the name or path to the target language model trained in Step 3 in monolingual specialization.
 - `--output_path` is the path to save the cross-lingual alignment adapter (CLA adapter). 
