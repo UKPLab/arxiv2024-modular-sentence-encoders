@@ -21,8 +21,8 @@ from sentence_transformers.util import (
 )
 from sentence_transformers.model_card_templates import ModelCardTemplate
 from sentence_transformers import __version__, SentenceTransformer
-from sentence_transformers.models import Transformer
 
+from .CustomTransformer import CustomTransformer
 from .utils import lang_2_script
 
 
@@ -342,13 +342,13 @@ class ModularSentenceTransformer(SentenceTransformer):
         # Save modules
         for idx, name in enumerate(self._modules):
             module = self._modules[name]
-            if idx == 0 and isinstance(module, Transformer):  # Save transformer model in the main folder
+            if idx == 0 and isinstance(module, CustomTransformer):  # Save transformer model in the main folder
                 model_path = path + "/"
             else:
                 model_path = os.path.join(path, str(idx) + "_" + type(module).__name__)
 
             os.makedirs(model_path, exist_ok=True)
-            if isinstance(module, Transformer):
+            if isinstance(module, CustomTransformer):
                 module.save(model_path, safe_serialization=safe_serialization)
             else:
                 module.save(model_path)

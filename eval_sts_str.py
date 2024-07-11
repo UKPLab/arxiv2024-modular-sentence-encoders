@@ -3,12 +3,14 @@ import logging
 import pandas as pd
 
 from sentence_transformers import LoggingHandler
+from sentence_transformers import models
 
 from sklearn.metrics.pairwise import paired_cosine_distances
 
 from scipy.stats import spearmanr
 
 from src.ModularSentenceTransformer import ModularSentenceTransformer
+from src.CustomTransformer import CustomTransformer
 
 from eval_utils import load_adapter_model
 from eval_data_utils import load_additional_sts17_data, load_sts17_data, load_str24_data, load_sts22_data, load_kardes_data
@@ -77,6 +79,14 @@ data = {
 logger.info("Evaluate singe model")
 model = ModularSentenceTransformer('sentence-transformers/LaBSE')  # an example
 model.max_seq_length = 512
+
+## Use the following code if training a SONAR model:
+# word_embedding_model = CustomTransformer(
+#     'cointegrated/SONAR_200_text_encoder',
+#     max_seq_length=512,
+# )
+# pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension())
+# model = ModularSentenceTransformer(modules=[word_embedding_model, pooling_model])
 
 for dataset_name, datasets in data.items():
     results = dict()
