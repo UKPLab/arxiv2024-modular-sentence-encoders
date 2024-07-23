@@ -1,5 +1,5 @@
 # Modular Sentence Encoders: Separating Language Specialization from Cross-Lingual Alignment
-[![Arxiv](https://img.shields.io/badge/Arxiv-YYMM.NNNNN-red?style=flat-square&logo=arxiv&logoColor=white)](https://put-here-your-paper.com)
+[![Arxiv](https://img.shields.io/badge/Arxiv-2407.14878-red?style=flat-square&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2407.14878)
 [![License](https://img.shields.io/github/license/UKPLab/ukp-project-template)](https://opensource.org/licenses/Apache-2.0)
 [![Python Versions](https://img.shields.io/badge/Python-3.10-blue.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 
@@ -128,7 +128,14 @@ The script [eval_belebele.py](eval.belebele.py) is for the evaluation on Belebel
 Please use the following citation:
 
 ```
-TODO
+@article{huang2024modularsentenceencodersseparating,
+      title={Modular Sentence Encoders: Separating Language Specialization from Cross-Lingual Alignment}, 
+      author={Yongxin Huang and Kexin Wang and Goran Glavaš and Iryna Gurevych},
+      year={2024},
+      url={https://arxiv.org/abs/2407.14878},
+      journal={ArXiv preprint},
+      volume={abs/2407.14878},
+}
 ```
 
 ## Disclaimer
