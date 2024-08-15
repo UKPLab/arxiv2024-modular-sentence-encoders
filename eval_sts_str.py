@@ -14,7 +14,7 @@ from src.CustomTransformer import CustomTransformer
 
 from eval_utils import load_adapter_model
 from eval_data_utils import load_additional_sts17_data, load_sts17_data, load_str24_data, load_sts22_data, load_kardes_data
-
+from src.utils import lang_2_script
 
 logging.basicConfig(
     format="%(asctime)s - %(message)s",
@@ -45,10 +45,10 @@ def eval_sts_str(langs: list, dataset: dict, model: ModularSentenceTransformer, 
     labels = dataset['scores']
     lang1, lang2 = langs
 
-    embs1 = model.encode(sents1, lang=lang1 if sonar else None, show_progress_bar=False)
+    embs1 = model.encode(sents1, lang=lang_2_script[lang1] if sonar else None, show_progress_bar=False)
 
     sents2_encoder = model2 if model2 else model
-    embs2 = sents2_encoder.encode(sents2, lang=lang2 if sonar else None, show_progress_bar=False)
+    embs2 = sents2_encoder.encode(sents2, lang=lang_2_script[lang2] if sonar else None, show_progress_bar=False)
 
     cosine_scores = 1 - (paired_cosine_distances(embs1, embs2))
     eval_spearman_cosine, _ = spearmanr(labels, cosine_scores)
@@ -62,6 +62,18 @@ logger.info("Load evaluation datasets")
 sts17 = load_sts17_data()
 sts17_additional = load_additional_sts17_data()
 sts17.update(sts17_additional)
+
+cs2 = sts17[('ces', 'ces')]['sentences2']
+de2 = sts17[('eng', 'deu')]['sentences2']
+fr2 = sts17[('eng', 'fra')]['sentences2']
+nl1 = sts17[('nld', 'eng')]['sentences1']
+it1 = sts17[('ita', 'eng')]['sentences1']
+
+scores = sts17[('ita', 'eng')]['scores']
+
+for lang2, sent2 in zip(['ces', 'deu', 'fra'], [cs2, de2, fr2]):
+    for lang1, sent1 in zip(['nld', 'ita'], [nl1, it1]):
+        sts17[(lang1, lang2)] = {'sentences1': sent1, 'sentences2': sent2, 'scores': scores}
 
 sts22 = load_sts22_data()
 str24 = load_str24_data()
@@ -79,6 +91,7 @@ data = {
 logger.info("Evaluate singe model")
 model = ModularSentenceTransformer('sentence-transformers/LaBSE')  # an example
 model.max_seq_length = 512
+sonar = False
 
 ## Use the following code if training a SONAR model:
 # word_embedding_model = CustomTransformer(
@@ -87,11 +100,12 @@ model.max_seq_length = 512
 # )
 # pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension())
 # model = ModularSentenceTransformer(modules=[word_embedding_model, pooling_model])
+# sonar = True
 
 for dataset_name, datasets in data.items():
     results = dict()
     for lang_pair, dataset in datasets.items():
-        score = eval_sts_str(lang_pair, dataset, model=model, sonar=False)
+        score = eval_sts_str(lang_pair, dataset, model=model, sonar=sonar)
         lang1, lang2 = lang_pair
         rev_pair = '-'.join([lang2, lang1])
         if rev_pair in results:
@@ -126,7 +140,7 @@ for dataset_name, datasets in data.items():
 
         if lang1 == lang2:  # Monolingual evaluation
             model = load_lang_model(lang1)
-            score = eval_sts_str(lang_pair, dataset, model=model, sonar=False)
+            score = eval_sts_str(lang_pair, dataset, model=model, sonar=sonar)
             results['-'.join(lang_pair)] = score
 
         else:  # Cross-lingual evaluation
@@ -139,7 +153,7 @@ for dataset_name, datasets in data.items():
             if lang2 != 'eng':
                 model2[0].auto_model.set_active_adapters('cla')
 
-            score = eval_sts_str(lang_pair, dataset, model=model1, model2=model2, sonar=False)
+            score = eval_sts_str(lang_pair, dataset, model=model1, model2=model2, sonar=sonar)
             rev_pair = '-'.join([lang2, lang1])
             if rev_pair in results:
                 results[rev_pair] = (score + results[rev_pair]) / 2  # average of lang1-lang2 and lang2-lang1 results
